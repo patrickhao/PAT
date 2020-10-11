@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+//move每次移动一串数字，奇数位数组只需移动一次即可，偶数位数组根据m的值需要移动若干次
 
 void move(int* arr, int m, int n, int startPosition) {
     int index, temp;
