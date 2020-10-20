@@ -1,8 +1,15 @@
 #include <cstdio>
+#include <cstdlib>
+//多项式相乘，指数的系数相加，e3只要开到2000即可
 
 int main() {
     freopen("./sample_in/1009.txt", "r", stdin);
-    double e1[1010] = {0.0}, e2[1010] = {0.0}, e3[2010] = {0.0}, temp2;
+    //分配的数组太大，常规方法分配会爆内存，只能动态分配并初始化
+    //double *e3 = (double*)malloc(1000010 * sizeof(double));
+    //for(int i = 0; i < 1000010; i++) {
+    //    e3[i] = 0;
+    //}
+    double e1[1010] = {0.0}, e2[1010] = {0.0}, e3[1000010] = {0.0}, temp2;
     int num, index = 0, temp1, e3Sum = 0;
     scanf("%d", &num);
     for(int i = 0; i < num; i++) {
@@ -23,19 +30,19 @@ int main() {
             }
         }        
     }
-    for(int i = 0; i < 2010; i++) {
+    for(int i = 0; i < 1000010; i++) {
         if(e3[i] != 0) {
             e3Sum++;
         }
     }
-    for(int i = 0; i < 2010; i++) {
+    for(int i = 0; i < 1000010; i++) {
         if(e3[i] != 0) {
             index = i;
             break;
         }
     }
     printf("%d ", e3Sum);
-    for(int i = 2009; i >= 0; i--) {
+    for(int i = 1000009; i >= 0; i--) {
         if(i == index) {
             break;
         }
