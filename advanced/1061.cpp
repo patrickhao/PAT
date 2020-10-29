@@ -1,7 +1,7 @@
 #include <cstdio>
 
 int main() {
-    freopen("./sample_in/1014.txt", "r", stdin);
+    freopen("./sample_in/1061.txt", "r", stdin);
     int day = 0, h, m, flag = 0;
     char t1[80] = {0}, t2[80] = {0}, dayTable[7][4] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
     scanf("%s %s", t1, t2);
