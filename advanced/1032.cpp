@@ -10,7 +10,7 @@ struct node {
         next = 0;
         tag = false;
     }
-} data[100000];
+} data[100010];
 
 int main() {
     freopen("./sample_in/1032.txt", "r", stdin);
