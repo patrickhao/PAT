@@ -41,7 +41,7 @@ int main() {
     }
     sort(arr, arr + 100010, cmp);
     
-    if(count < 0) {
+    if(count == 0) {
         printf("0 -1\n");
     }
     else {

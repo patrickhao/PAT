@@ -35,9 +35,9 @@ void insert(node* &root, int x) {
 
     //true根据题目具体条件进行替换
     if(true) {
-        search(root->lchild, x);
+        insert(root->lchild, x);
     } else {
-        serach(root->rchild, x);
+        insert(root->rchild, x);
     }
 }
 
@@ -76,7 +76,7 @@ void posorder(node* root) {
     printf("%d", root->data);
 }
 
-void layerorder(node* root) {
+void layerOrder(node* root) {
     queue<node*> q;
     q.push(root);
     while(!q.empty()) {
