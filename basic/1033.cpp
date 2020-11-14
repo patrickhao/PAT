@@ -14,7 +14,7 @@ int main() {
     for(int i = 0; i < s1.length(); i++) {
         char c = s1[i];
         if(c == '+') {
-            for(int i = 'A'; i < 'Z'; i++) {
+            for(int i = 'A'; i <= 'Z'; i++) {
                 hashTable[i] = 1;
             }
         } else if(isalpha(c)) {
