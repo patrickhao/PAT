@@ -56,17 +56,25 @@ void preorder2(node* root) {
         flag = false;
     }
     indAns++;
-    ans[indAns++] = root->data;
     preorder2(root->rchild);
     preorder2(root->lchild);
 }
 
-void posorder(node* root) {
+void posorder1(node* root) {
     if(root == NULL) {
         return;
     }
-    posorder(root->lchild);
-    posorder(root->rchild);
+    posorder1(root->lchild);
+    posorder1(root->rchild);
+    ans[indAns++] = root->data;
+}
+
+void posorder2(node* root) {
+    if(root == NULL) {
+        return;
+    }
+    posorder2(root->rchild);
+    posorder2(root->lchild);
     ans[indAns++] = root->data;
 }
 
@@ -76,6 +84,8 @@ int main() {
     for(int i = 0; i < n; i++) {
         scanf("%d", arr + i);
     }
+    
+    int tag = 0;
     node* root = create(arr, n);
     indAns = 0;
     preorder1(root);
@@ -83,11 +93,20 @@ int main() {
         flag = true;
         indAns = 0;
         preorder2(root);
+        if(flag) {
+            tag = 2;
+        }
+    } else {
+        tag = 1;
     }
     if(flag) {
         printf("YES\n");
         indAns = 0;
-        posorder(root);
+        if(tag == 1) {
+            posorder1(root);
+        } else {
+            posorder2(root);
+        }
         for(int i = 0; i < indAns - 1; i++) {
             printf("%d ", ans[i]);
         }
