@@ -1,134 +1,78 @@
-#include <cstdio>
-#include <algorithm>
-#include <vector>
+#include <iostream>
+#include <string>
+#include <map>
 
 using namespace std;
 
-const int MAXN = 270000;
-struct node {
-    int v;
-    int w;
-};
+const int MAXN = 2020;
+const int INF = 1000000000;
 
-struct ansNode {
-    int head;
-    int num;
-};
-
-vector<node> Adj[MAXN];
-vector<ansNode> vAns;
-vector<int> headLine;
+int G[MAXN][MAXN] = {0}, weight[MAXN] = {0};
 bool vis[MAXN] = {false};
-int n, k;
-int num, numPerson, timeAll;
 
-bool cmp(ansNode a1, ansNode a2) {
-    if(a1.head / 10000 != a2.head / 10000) {
-        return a1.head / 10000 < a2.head / 10000;
-    } else if(a1.head / 100 % 100 != a2.head / 100 % 100) {
-        return a1.head / 100 % 100 < a2.head / 100 % 100;
-    } else {
-        return a1.head % 10000 < a2.head % 10000;
-    }
-}
+int n, k, numGang = 0, indexPerson = 0;
+map<string, int> Gang;
+map<string, int> stringToInt;
+map<int, string> intToString;
 
-int s2n(char s[]) {
-    return (s[2] - 'A') * 10000 + (s[1] - 'A') * 100 + (s[0] - 'A');
-}
-
-void pn2s(int n) {
-    char ans[3] = {0};
-    for(int i = 0; i < 3; i++) {
-        ans[i] = n % 100 + 'A';
-        n /= 100;
-    }
-    printf("%s", ans);
-}
-
-int findHead() {
-    int head, maxv = 0;
-    for(int i = 0; i < headLine.size(); i++) {
-        int temp = 0;
-        for(int j = 0; j < Adj[headLine[i]].size(); j++) {
-            temp += Adj[headLine[i]][j].w;
-        }
-        if(temp > maxv) {
-            maxv = temp;
-            head = headLine[i];
-        }
-    }
-    return head;
-}
-
-void dfs(int u) {
-    headLine.push_back(u);
+void dfs(int u, int &headnum, int &num, int &weightAll) {
     vis[u] = true;
-    for(int i = 0; i < Adj[u].size(); i++) {
-        timeAll += Adj[u][i].w;
-        if(!vis[Adj[u][i].v]) {
-            numPerson++;
-            dfs(Adj[u][i].v);
+    num++;
+    if(weight[u] > weight[headnum]) {
+        headnum = u;
+    }
+    for(int v = 0; v < indexPerson; v++) {
+        if(G[u][v] > 0) {
+            weightAll += G[u][v];
+            G[u][v] = G[v][u] = 0;
+            if(!vis[v]) {
+                dfs(v, headnum, num, weightAll);
+            }
         }
     }
 }
 
 void dfsTrave() {
-    num = 0;
-    for(int i = 0; i < MAXN; i++) {
-        if(Adj[i].size() != 0 && !vis[i]) {
-            numPerson = 1;
-            timeAll = 0;
-            headLine.clear();
-            dfs(i);
-            if(numPerson > 2 && (timeAll / 2) > k) {
-                ansNode temp;
-                temp.head = findHead();
-                temp.num = numPerson;
-                vAns.push_back(temp);
-                num++;
+    for(int u = 0; u < indexPerson; u++) {
+        if(!vis[u]) {
+            int headnum = u, num = 0, weightAll = 0;
+            dfs(u, headnum, num, weightAll);
+            if(num > 2 && weightAll > k) {
+                Gang[intToString[headnum]] = num;
             }
+
         }
+    }
+}
+
+int change(string str) {
+    if(stringToInt.find(str) != stringToInt.end()) {
+        return stringToInt[str];
+    } else {
+        stringToInt[str] = indexPerson;
+        intToString[indexPerson] = str;
+        return indexPerson++;
     }
 }
 
 int main() {
     freopen("./sample_in/1034.txt", "r", stdin);
-    scanf("%d %d", &n, &k);
+    cin >> n >> k;
+    string str1, str2;
+    int w, index1, index2;
     while(n--) {
-        char name1[4], name2[4];
-        int times, index1, index2;
-        bool flag = true;
-        scanf("%s %s %d", name1, name2, &times);
-        index1 = s2n(name1);
-        index2 = s2n(name2);
-        for(int i = 0; i < Adj[index1].size(); i++) {
-            if(Adj[index1][i].v == index2) {
-                flag = false;
-                Adj[index1][i].w += times;
-                for(int j = 0; j < Adj[index2].size(); j++) {
-                    if(Adj[index2][i].v == index1) {
-                        Adj[index2][j].w += times;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-        if(flag) {
-            node temp;
-            temp.v = index2;
-            temp.w = times;
-            Adj[index1].push_back(temp);
-            temp.v = index1;
-            Adj[index2].push_back(temp);
-        }
+        cin >> str1 >> str2 >> w;
+        index1 = change(str1);
+        index2 = change(str2);
+        weight[index1] += w;
+        weight[index2] += w;
+        G[index1][index2] += w;
+        G[index2][index1] += w; 
     }
     dfsTrave();
-    sort(vAns.begin(), vAns.end(), cmp);
-    printf("%d\n", num);
-    for(int i = 0; i < vAns.size(); i++) {
-        pn2s(vAns[i].head);
-        printf(" %d\n", vAns[i].num);
+    cout << Gang.size() << endl;
+    for(auto it = Gang.begin(); it != Gang.end(); it++) {
+        cout << it->first << " " << it->second << endl;
     }
 
     return 0;
