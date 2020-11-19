@@ -1,55 +1,42 @@
 #include <cstdio>
-#include <cstring>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
-int indexS = 0, indexSt = 0, s[100010], st[100010];
-
 int main() {
     freopen("./sample_in/1057.txt", "r", stdin);
-    int n, lastelem;
-    bool tag = false;
-    char input[15] = {0};
+    vector<int> s, st;
+    int n, temp;
+    char command[12] = {0};
     scanf("%d", &n);
     while(n--) {
-        scanf("%s", input);
-        if(strcmp(input, "Pop") == 0) {
-            if(indexS == 0) {
+        scanf("%s", command);
+        if(command[1] == 'u') {
+            scanf("%d", &temp);
+            s.push_back(temp);
+        } else if(command[1] == 'o') {
+            if(s.empty()) {
                 printf("Invalid\n");
             } else {
-                tag = true;
-                printf("%d\n", s[indexS - 1]);
-                indexS--;
+                printf("%d\n", s[s.size() - 1]);
+                s.pop_back();
             }
-        } else if(strcmp(input, "Push") == 0) {
-            tag = true;
-            scanf("%d", &s[indexS++]);
-        } else if(strcmp(input, "PeekMedian") == 0) {
-            if(indexS == 0) {
+        } else if(command[1] == 'e') {
+            if(s.empty()) {
                 printf("Invalid\n");
             } else {
-                if(tag) {
-                    tag = false;
-                    indexSt = 0;
-                    for(int i = 0; i < indexS; i++) {
-                        st[indexSt++] = s[i];
-                    }
-                    sort(st, st + indexSt);
-                    if(indexSt % 2 == 0) {
-                        lastelem = st[(indexSt - 1) / 2];
-                    } else {
-                        lastelem = st[indexSt / 2];
-                    }
-                    printf("%d\n", lastelem);
+                st = s;
+                sort(st.begin(), st.end());
+                if(st.size() % 2 == 0) {
+                    printf("%d\n", st[st.size() / 2]);
                 } else {
-                    printf("%d\n", lastelem);
+                    printf("%d\n", st[(st.size() + 1) / 2]);
                 }
             }
         } else {
             printf("Invalid\n");
         }
-
     }
     return 0;
 }
