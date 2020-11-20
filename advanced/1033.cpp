@@ -65,13 +65,13 @@ int main() {
                 curIndex = minIndex;
             } else {
                 if (d - curDist <= dmax) {
-                    finish = true;
                     if (gasLeft * davg >= (d - curDist)) {
-                        gasLeft = gasLeft - cDist / davg;
+                        gasLeft = gasLeft - (d - curDist) / davg;
                     } else {
                         gasLeft = 0;
                         cost = cost + ((d - curDist) / davg - gasLeft) * sta[curIndex].price;
                     }
+                    finish = true;
                     break;
                 } else {
                     gasLeft = cmax - cDist / davg;
