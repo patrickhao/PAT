@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <algorithm>
-#include <vector>
 
 using namespace std;
 
@@ -25,64 +24,62 @@ int main() {
 
     double cost = 0.0, gasLeft = 0.0, curDist = 0.0;
     int curIndex = 0;
-    bool finish = false;
-    while (true) {
-        if (curIndex == n - 1) {
+    bool finish = false, loopFlag = true;
+    if (sta[0].dist != 0) {
+        loopFlag = false;
+    }
+    while (loopFlag) {
+        // find the next gas station
+        int nextIndex = curIndex;
+        for (int i = nextIndex + 1; i < n && sta[i].dist - sta[curIndex].dist <= dmax; i++) {
+            if (sta[i].price < sta[curIndex].price) {
+                nextIndex = i;
+                break;
+            }
+        }
+        if (nextIndex == curIndex) {
+            double minPrice = 99999999.9;
+            for (int i = nextIndex + 1; i < n && sta[i].dist - sta[curIndex].dist <= dmax; i++) {
+                if (sta[i].price < minPrice) {
+                    minPrice = sta[i].price;
+                    nextIndex = i;
+                }
+            }
+        }
+
+        if (sta[nextIndex].price < sta[curIndex].price) {
+            if (gasLeft * davg >= sta[nextIndex].dist - curDist) {
+                gasLeft = gasLeft - (sta[nextIndex].dist - curDist) / davg;
+            } else {
+                cost = cost + ((sta[nextIndex].dist - curDist) / davg - gasLeft) * sta[curIndex].price;
+                gasLeft = 0.0;
+            }
+            curDist = sta[nextIndex].dist;
+            curIndex = nextIndex;
+        } else {
             if (d - curDist <= dmax) {
                 if (gasLeft * davg < d - curDist) {
                     cost = cost + ((d - curDist) / davg - gasLeft) * sta[curIndex].price;
                 }
                 finish = true;
                 break;
-            } else {
+            } else if (nextIndex == curIndex) {
+                curDist += dmax;
                 finish = false;
                 break;
-            }
-        } else {
-            int i = curIndex + 1, minIndex = 0;
-            double cDist = -1.0, minPrice = 99999999.9;
-            while (i < n && sta[i].dist - sta[curIndex].dist <= dmax) {
-                if (sta[i].price < minPrice) {
-                    minPrice = sta[i].price;
-                    cDist = sta[i].dist - sta[curIndex].dist;
-                    minIndex = i;
-                }
-                i++;
-            }
-            if (cDist == -1.0) {
-                finish = false;
-                curDist = sta[curIndex].dist + dmax;
+            } else {
                 cost = cost + (cmax - gasLeft) * sta[curIndex].price;
-                break;
-            } else if (minPrice < sta[curIndex].price) {
-                if (gasLeft * davg >= cDist) {
-                    gasLeft = gasLeft - cDist / davg;
-                } else {
-                    gasLeft = 0;
-                    cost = cost + (cDist / davg - gasLeft) * sta[curIndex].price;
-                }
-                curDist = sta[minIndex].dist;
-                curIndex = minIndex;
-            } else {
-                if (d - curDist <= dmax) {
-                    if (gasLeft * davg >= (d - curDist)) {
-                        gasLeft = gasLeft - (d - curDist) / davg;
-                    } else {
-                        gasLeft = 0;
-                        cost = cost + ((d - curDist) / davg - gasLeft) * sta[curIndex].price;
-                    }
-                    finish = true;
-                    break;
-                } else {
-                    gasLeft = cmax - cDist / davg;
-                    cost = cost + (cmax - gasLeft) * sta[curIndex].price;
-                    curDist = sta[minIndex].dist;
-                    curIndex = minIndex;
-                }
+                gasLeft = cmax - (sta[nextIndex].dist - curDist) / davg ;
+                curDist = sta[nextIndex].dist;
+                curIndex = nextIndex;
             }
         }
     }
-    printf("%f", cost);
-    
+    if (finish) {
+        printf("%0.2f\n", cost);
+    } else {
+        printf("The maximum travel distance = %0.2f", curDist);
+    }
+
     return 0;
 }
