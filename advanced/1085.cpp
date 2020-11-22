@@ -4,23 +4,39 @@
 
 using namespace std;
 int n, p, i;
-vector<int> arr(n);
+int arr[100010];
 
-void binarySearch(int left, int right) {
+int binarySearch(int left, int right) {
     int mid;
-    while (left <= right) {
-        if (arr[mid] <= arr[i] * p) {
-            
+    while (left < right) {
+        mid = (left + right) / 2;
+        if (arr[mid] <= (long long)arr[i] * p) {
+            left = mid + 1;
+        } else {
+            right = mid;
         }
     }
+    return left;
 }
 
 int main() {
     freopen("./sample_in/1085.txt", "r", stdin);
-    cin >> n >> p;
+    scanf("%d %d", &n, &p);
     for (int i = 0; i < n; i++) {
-        cin >> arr[i];
+        scanf("%d", arr + i);
     }
-    sort(arr.begin(), arr.end());
+    sort(arr, arr + n);
+
+    int ans = 1;
+    for (int i = 0; i < n; i++) {
+        int r;
+        if (arr[n - 1] <= (long long)arr[i] * p) {
+            r = n;
+        } else {
+            r = binarySearch(i + 1, n - 1);
+        }
+        ans = max(ans, r - i);
+    }
+    printf("%d", ans);
     return 0;
 }
