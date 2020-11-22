@@ -153,7 +153,7 @@ int main() {
         showPath(path1);
         cout << endl;
         cout << "Time = " << t[ed] << ": ";
-        showPath(path1);
+        showPath(path2);
         cout << endl;
     }
 
