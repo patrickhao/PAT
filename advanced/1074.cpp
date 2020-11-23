@@ -1,82 +1,62 @@
 #include <cstdio>
-#include <vector>
+#include <algorithm>
 
 using namespace std;
+const int maxn = 100010;
 
 struct node {
-    int val;
-    int next;
-} List[100010];
+    int address, data, next;
+    int tag;
+} List[maxn];
 
-int reverse(int head, int k) {
-    vector<int> path;
-    int curIndex = head, tail;
-    for (int i = 0; i < k; i++) {
-        if (i != k - 1) {
-            path.push_back(curIndex); 
-        } else {
-            tail = curIndex;
-        }
-        curIndex = List[curIndex].next;
-    }
-    curIndex = List[head].next;
-    List[head].next = List[tail].next;
-    for (int i = 0; i < k - 1; i++) {
-        int tNextIndex = List[curIndex].next;
-        List[curIndex].next = path[i];
-        curIndex = tNextIndex;
-    }
-    return tail;
-}
-
-int findTail(int head, int k) {
-    int ans = head;
-    for (int i = 0; i < k - 1; i++) {
-        ans = List[ans].next;
-    }
-    return ans;
-}
-
-void putList(int root) {
-    int cur = root;
-    while (cur != -1) {
-        if (List[cur].next != -1) {
-            printf("%.5d %d %.5d\n", cur, List[cur].val, List[cur].next);
-        } else {
-            printf("%.5d %d %d\n", cur, List[cur].val, List[cur].next);
-        }
-        cur = List[cur].next;
-    }
+bool cmp(node n1, node n2) {
+    return n1.tag < n2.tag;
 }
 
 int main() {
     freopen("./sample_in/1074.txt", "r", stdin);
-    int n, k;
-    int root;
-    scanf("%d %d %d", &root, &n, &k);
+    for (int i = 0; i < maxn; i++) {
+        List[i].tag = maxn;
+    }
+    int head, n, k;
+    scanf("%d %d %d", &head, &n, &k);
     for (int i = 0; i < n; i++) {
         int ad;
-        node temp;
-        scanf("%d %d %d", &ad, &temp.val, &temp.next);
-        List[ad] = temp;
+        scanf("%d", &ad);
+        scanf("%d %d", &List[ad].data, &List[ad].next);
+        List[ad].address = ad;
     }
-    int cur, newHead, preTail;
-    cur = newHead = root;
-    for (int i = 0; i < n / k; i++) {
-        int r = reverse(cur, k);
-        if (i == 0) {
-            newHead = r;
-        } else {
-            List[preTail].next = r;
-        }
-        preTail = findTail(r, k);
+    int cur = head, count = 0;
+    while (cur != -1) {
+        List[cur].tag = count++;
         cur = List[cur].next;
     }
-    if (k > 0) {
-        List[preTail].next = cur;
-    }
+    sort(List, List + maxn, cmp);
+    n = count;
 
-    putList(newHead);
+    for (int i = 0; i < n / k; i++) {
+        for (int j = (i + 1) * k - 1; j > i * k; j--) {
+            printf("%05d %d %05d\n", List[j].address, List[j].data, List[j - 1].address);
+        }
+        printf("%05d %d ", List[i * k].address, List[i * k].data);
+        if (i < n / k - 1) {
+            printf("%05d\n", List[(i + 2) * k - 1].address);
+        } else {
+            if (n % k == 0) {
+                printf("-1\n");
+            } else {
+                printf("%05d\n", List[(i + 1) * k].address);
+                for (int j = n / k * k; j < n; j++) {
+                    printf("%05d %d ", List[j].address, List[j].data);
+                    if (j < n - 1) {
+                        printf("%05d\n", List[j + 1].address);
+                    } else {
+                        printf("-1\n");
+                    }
+                }
+            }
+        }
+    }
 
     return 0;
 }
