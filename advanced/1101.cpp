@@ -1,9 +1,10 @@
 #include <cstdio>
 #include <iostream>
 #include <algorithm>
-#include <set>
+#include <vector>
 
 using namespace std;
+const int INF = 1000000000;
 int d[100010];
 int dmax[100010], dmin[100010];
 
@@ -11,29 +12,29 @@ int main() {
     freopen("./sample_in/1101.txt", "r", stdin);
     int n;
     scanf("%d", &n);
-    scanf("%d", &d[0]);
-    dmax[0] = d[0];
-    for (int i = 1; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         scanf("%d", d + i);
-        dmax[i] = max(dmax[i - 1], d[i]);
     }
-    dmin[n - 1] = d[n - 1];
+    dmax[0] = -INF;
+    dmin[n - 1] = INF;
+    for (int i = 1; i < n; i++) {
+        dmax[i] = max(d[i - 1], dmax[i - 1]);
+    }
     for (int i = n - 2; i >= 0; i--) {
-        dmin[i] = min(dmin[i + 1], d[i]);
+        dmin[i] = min(dmin[i + 1], d[i + 1]);
     }
 
-    set<int> ans;
+    vector<int> ans;
     for (int i = 0; i < n; i++) {
-        if (dmax[i] <= d[i] && dmin[i] >= d[i]) {
-            ans.insert(i + 1);
+        if (dmax[i] < d[i] && dmin[i] > d[i]) {
+            ans.push_back(d[i]);
         }
     } 
     
-    int num = 0;
     cout << ans.size() << endl;
-    for (auto it = ans.begin(); it != ans.end(); it++) {
-        cout << *it;
-        if (num++ != ans.size() - 1) {
+    for (int i = 0; i < ans.size(); i++) {
+        cout << ans[i];
+        if (i != ans.size() - 1) {
             cout << " ";
         }
     }

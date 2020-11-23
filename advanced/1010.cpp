@@ -15,7 +15,7 @@ int transform(char c) {
     }
 }
 
-long long toDecimal(char num[], int tag) {
+long long toDecimal(char num[], long long tag) {
     long long ans = 0;
     for (int i = 0; i < strlen(num); i++) {
         ans = ans * tag + transform(num[i]);
@@ -23,8 +23,8 @@ long long toDecimal(char num[], int tag) {
     return ans;
 }
 
-int binarySearch(int left, int right, long long n1) {
-    int mid;
+long long binarySearch(long long left, long long right, long long n1) {
+    long long mid;
     while (left < right) {
         mid = left + (right - left) / 2;
         if (toDecimal(num2, mid) >= n1) {
@@ -48,13 +48,13 @@ int main() {
     n1 = toDecimal(num1, d1);
 
     //find bound
-    int left = 0;
+    long long left = 0;
     for (int i = 0; i < strlen(num2); i++) {
-        if (transform(num2[i]) > left) {
-            left = transform(num2[i]);
+        if ((long long)transform(num2[i]) > left) {
+            left = (long long)transform(num2[i]);
         }
     }
-    int d2 = binarySearch(left + 1, 1000000000, n1);
+    long long d2 = binarySearch(left + 1, 1000000000, n1);
     if (toDecimal(num2, d2) != n1) {
         printf("Impossible\n");
     } else {
