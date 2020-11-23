@@ -1,64 +1,55 @@
 #include <cstdio>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
+const int maxn = 100010;
 
 struct node {
-    int val;
-    int next;
+    int address, data, next;
+    int tag;
+
+    node () {
+        tag = 2 * maxn;
+    }
 } List[100010];
 
-void putList(int head) {
-    int h = head;
-    while (h != -1) {
-        if (List[h].next == -1) {
-            printf("%.5d %d %d\n", h, List[h].val, List[h].next);
-        } else {
-            printf("%.5d %d %.5d\n", h, List[h].val, List[h].next);
-        }
-        h = List[h].next;
-    }
+bool cmp(node n1, node n2) {
+    return n1.tag < n2.tag;
 }
 
 int main() {
     freopen("./sample_in/1097.txt", "r", stdin);
-    bool hashTable[10010] = {false};
-    int n, head;
-    scanf("%d %d", &head, &n);
-    for (int i = 0; i < n; i++) {
+    int begin, n;
+    bool hashTable[maxn] = {false};
+    scanf("%d %d", &begin, &n);
+    while (n--) {
         int ad;
-        node temp;
-        scanf("%d %d %d", &ad, &temp.val, &temp.next);
-        List[ad] = temp;
+        scanf("%d", &ad);
+        scanf("%d %d", &List[ad].data, &List[ad].next);
+        List[ad].address = ad;
     }
-
-    int cur, pre, index;
-    int nHead, nTail;
-    cur = pre = head;
-    nHead = nTail = -1;
-    hashTable[index] = true;
-    cur = List[cur].next;
-    while (cur != -1) {
-        index = abs(List[cur].val);
-        int tNext = List[cur].next;
-        if (hashTable[index]) {
-            List[pre].next = List[cur].next;
-            if (nHead == -1) {
-                nTail = nHead = cur;
-                List[nTail].next = -1;
-            } else {
-                List[nTail].next = cur;
-                nTail = cur;
-                List[nTail].next = -1;
-            }
+    int p = begin;
+    int n1 = 0, n2 = 0;
+    while (p != -1) {
+        int absv = abs(List[p].data);
+        if (hashTable[absv]) {
+            List[p].tag = maxn + n2++;
         } else {
-            hashTable[index] = true;
-            pre = cur;
+            List[p].tag = n1++;
+            hashTable[absv] = true;
         }
-        cur = tNext;
+        p = List[p].next;
     }
-    putList(head);
-    putList(nHead);
-
+    sort(List, List + maxn, cmp);
+    
+    for (int i = 0; i < n1 + n2; i++) {
+        printf("%05d %d ", List[i].address, List[i].data);
+        if (i == n1 -1 || i == n1 + n2 - 1) {
+            printf("-1\n");
+        } else {
+            printf("%05d\n", List[i + 1].address);
+        }
+    }
     return 0;
 }

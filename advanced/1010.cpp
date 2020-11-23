@@ -4,36 +4,61 @@
 #include <algorithm>
 
 using namespace std;
+typedef long long LL;
+LL inf = (1LL << 63) - 1;
 
 char num1[12], num2[12];
 
-int transform(char c) {
+LL transform(char c) {
+    LL ans;
     if (isalpha(c)) {
-        return c - 'a' + 10;
+        ans = c - 'a' + 10;
     } else {
-        return c - '0';
-    }
-}
-
-long long toDecimal(char num[], long long tag) {
-    long long ans = 0;
-    for (int i = 0; i < strlen(num); i++) {
-        ans = ans * tag + transform(num[i]);
+        ans = c - '0';
     }
     return ans;
 }
 
-long long binarySearch(long long left, long long right, long long n1) {
-    long long mid;
-    while (left < right) {
+LL toDecimal(char num[], LL tag, LL t) {
+    LL ans = 0;
+    for (int i = 0; i < strlen(num); i++) {
+        ans = ans * tag + transform(num[i]);
+        if(ans < 0 || ans > t) {
+            return -1;
+        }
+    }
+    return ans;
+}
+
+int cmp(char num2[], LL tag, LL t) {
+    LL num = toDecimal(num2, tag, t);
+    if (num < 1) {
+        return 1;
+    }
+    if (t > num) {
+        return -1;
+    } else if (t == num) {
+        return 0;
+    } else {
+        return 1;
+    }
+    
+}
+
+LL binarySearch(char num2[], LL left, LL right, LL n1) {
+    LL mid;
+    while (left <= right) {
         mid = left + (right - left) / 2;
-        if (toDecimal(num2, mid) >= n1) {
-            right = mid;
+        int flag = cmp(num2, mid, n1);
+        if (flag == 0) {
+            return mid;
+        } else if (flag > 0) {
+            right = mid - 1;
         } else {
             left = mid + 1;
         }
     }
-    return left;
+    return -1;
 }
 
 int main() {
@@ -44,21 +69,22 @@ int main() {
     if (tag == 2) {
         swap(num1, num2);
     }
-    long long n1 = 0;
-    n1 = toDecimal(num1, d1);
+    LL n1 = 0;
+    n1 = toDecimal(num1, d1, inf);
 
     //find bound
-    long long left = 0;
+    LL left = -1;
     for (int i = 0; i < strlen(num2); i++) {
-        if ((long long)transform(num2[i]) > left) {
-            left = (long long)transform(num2[i]);
+        if (transform(num2[i]) > left) {
+            left = transform(num2[i]);
         }
     }
-    long long d2 = binarySearch(left + 1, 1000000000, n1);
-    if (toDecimal(num2, d2) != n1) {
+    LL right = max(left, n1) + 1;
+    LL d2 = binarySearch(num2, left + 1, right, n1);
+    if (d2 == -1) {
         printf("Impossible\n");
     } else {
-        printf("%d\n", d2);
+        printf("%lld\n", d2);
     }
 
     return 0;
