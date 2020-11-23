@@ -5,6 +5,8 @@
 
 using namespace std;
 
+char num1[12], num2[12];
+
 int transform(char c) {
     if (isalpha(c)) {
         return c - 'a' + 10;
@@ -21,9 +23,21 @@ long long toDecimal(char num[], int tag) {
     return ans;
 }
 
+int binarySearch(int left, int right, long long n1) {
+    int mid;
+    while (left < right) {
+        mid = left + (right - left) / 2;
+        if (toDecimal(num2, mid) >= n1) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return left;
+}
+
 int main() {
     freopen("./sample_in/1010.txt", "r", stdin);
-    char num1[12], num2[12];
     int tag, d1;
     scanf("%s %s", num1, num2);
     scanf("%d %d", &tag, &d1);
@@ -31,26 +45,17 @@ int main() {
         swap(num1, num2);
     }
     long long n1 = 0;
-    for (int i = 0; i < strlen(num1); i++) {
-        n1 = n1 * d1 + transform(num1[i]);
-    }
+    n1 = toDecimal(num1, d1);
 
     //find bound
-    int right = 0;
+    int left = 0;
     for (int i = 0; i < strlen(num2); i++) {
-        if (transform(num2[i]) > right) {
-            right = transform(num2[i]);
+        if (transform(num2[i]) > left) {
+            left = transform(num2[i]);
         }
     }
-    
-    int d2 = -1;
-    for (int i = 2; i < right + 2; i++) {
-        if (toDecimal(num2, i) == n1) {
-            d2 = i;
-            break;
-        }
-    }
-    if (d2 == -1) {
+    int d2 = binarySearch(left + 1, 1000000000, n1);
+    if (toDecimal(num2, d2) != n1) {
         printf("Impossible\n");
     } else {
         printf("%d\n", d2);

@@ -7,7 +7,7 @@
 using namespace std;
 
 int n, amount, MIN = 1000000000;
-int c[1000010];
+int c[100010];
 map<int, int> ans1, ans2;
 
 int arrSum(int left, int right) {
