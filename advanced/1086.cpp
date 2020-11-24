@@ -16,12 +16,12 @@ node* newNode(int d) {
     return Node;
 }
 
-void insert(node* &root, int d) {
-    if (root == NULL) {
-        root = newNode(d);
+vector<int> v;
+node* create(node* root, int index) {
+    if (v[index] == -1) {
+        return NULL;
     }
-    insert(root->lchild, d);
-    insert(root->rchlid, d);
+    root->data = v[index];
 }
 
 int b = 0;
@@ -45,12 +45,6 @@ int main() {
     int elem;
     char tag[5];
     scanf("%d", &n);
-    for (int i = 0; i < 2 * n; i++) {
-        scanf("%s %d", tag, &elem);
-        if (tag[1] == 'u') {
-            insert(root, elem);
-        } 
-    }
     posOrder(root);
 
     return 0;
