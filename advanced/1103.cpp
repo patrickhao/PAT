@@ -1,82 +1,51 @@
 #include <cstdio>
 #include <cmath>
 #include <vector>
-#include <queue>
 #include <algorithm>
 
 using namespace std;
 int n, k, p;
-vector<int> ans, temp;
+vector<int> ans, path;
+int ansValue = 0;
 
-int vSum(vector<int> v) {
-    int ans;
-    for (int i : v) {
-        ans += i;
-    }
-    return ans;
-}
-
-bool cmp1(int n1, int n2) {
-    return n1 > n2;
-}
-
-bool cmp2(vector<int> v1, vector<int> v2) {
-    int s1 = vSum(v1), s2 = vSum(v2);
-    sort(v1.begin(), v1.end(), cmp1);
-    sort(v2.begin(), v2.end(), cmp1);
-    if (s1 != s2) {
-        return s1 > s2;
-    } else {
-        for (int i = 0; i < v1.size(); i++) {
-            if (v1[i] != v2[i]) {
-                return v1[i] > v2[i];
-            }
+void dfs(int index, int count, int sum, int pSum) {
+    if (sum == n && count == k) {
+        if (pSum > ansValue) {
+            ansValue = pSum;
+            ans = path;
         }
-    }
-    return false;
-}
-
-int myPow(int elem, int p) {
-    int ans = 1;
-    for (int i = 0; i < p; i++) {
-        ans *= elem;
-    }
-    return ans;
-}
-
-void dfs(int sum, int pos, int elem) {
-    sum += myPow(elem, p);
-    if (sum > elem) {
-        return;
-    } else if (sum == elem) {
-        temp.push_back(elem);
-        if (pos == k && cmp2(temp, ans)) {
-            ans = temp;
-        }
-        temp.pop_back();
         return;
     }
-    temp.push_back(elem);
-    for (int i = 1; i * i <= n; i++) {
-        dfs(sum, pos + 1, i);
-    }
-    temp.pop_back();
-}
 
-void dfsTrave() {
-    for (int i = 0; i * i <= n; i++) {
-        dfs(0, 1, i);
+    if (sum > n || count > k) {
+        return;
+    }
+
+    if (index > 0) {
+        path.push_back(index);
+        dfs(index, count + 1, sum + pow(index, p), pSum + index);   
+        path.pop_back();
+        dfs(index - 1, count, sum, pSum);
     }
 }
 
 int main() {
     freopen("./sample_in/1103.txt", "r", stdin);
     scanf("%d %d %d", &n, &k, &p);
-    ans.resize(k);
-    temp.resize(k);
-    dfsTrave();
-    printf("%d", ans[1]);
-    printf("%d", temp[1]);
+    dfs((int)sqrt(n), 0, 0, 0);
+    if (ans.size() != 0) {
+        printf("%d = ", n);
+        for (int i = 0; i < k; i++) {
+            printf("%d^%d", ans[i], p);
+            if (i < k - 1) {
+                printf(" + ");
+            } else {
+                printf("\n");
+            }
+        }
+    } else {
+        printf("Impossible\n");
+    }
 
     return 0;
 }
