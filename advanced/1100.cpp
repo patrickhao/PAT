@@ -17,75 +17,36 @@ int toInt(string s) {
     return ans;
 }
 
-
 using namespace std;
 int main() {
     freopen("./sample_in/1100.txt", "r", stdin);
     int n;
-    map<string, int> dict1, dict2;
-    map<int, string> cict1, cict2;
-    for (int i = 0; i < 13; i++) {
-        dict1[s1[i]] = i;
-        cict1[i] = s1[i];
-        dict2[s2[i]] = i;
-        cict2[i] = s2[i];
-    }
-
     cin >> n;
     getchar();
+    map<string, int> strToNum;
+    map<int, string> numToStr;
+    // 打表
+    for (int i = 0; i < 13; i++) {
+        strToNum[s1[i]] = i;
+        strToNum[s2[i]] = 13 * i;
+        numToStr[i] = s1[i];
+        numToStr[13 * i] = s2[i];
+    }
+    for (int i = 1; i < 13; i++) {
+        for (int j = 1; j < 13; j++) {
+            string temp = numToStr[13 * i] + " " + numToStr[j];
+            strToNum[temp] = 13 * i + j;
+            numToStr[13 * i + j] = temp;
+        }
+    }
+    string str;
     while (n--) {
-        string str;
         getline(cin, str);
         if (isdigit(str[0])) {
-            vector<string> v;
-            int num = toInt(str);
-            bool flag = true;
-            while (num) {
-                int t = num % 13;
-                if (flag) {
-                    flag = false;
-                    v.push_back(cict1[t]);
-                } else {
-                    v.push_back(cict2[t]);
-                }
-                num /= 13;
-            }
-            for (int i = v.size() - 1; i >= 0; i--) {
-                cout << v[i];
-                if (i != 0) {
-                    cout << " ";
-                } else {
-                    cout << endl;
-                }
-            }
+            int r = toInt(str);
+            cout << numToStr[r] << endl;
         } else {
-            int i = 0, ans = 0, cn = 0, pn = 0;
-            for (int i = 0; i < str.size(); i++) {
-                if (str[i] == ' ') {
-                    cn++;
-                }
-            }
-            while (i < str.size()) {
-                string word;
-                while (isalpha(str[i])) {
-                    word += str[i];
-                    i++;
-                }
-                if (pn == cn) {
-                    if (dict1[word] != 0) {
-                        ans += dict1[word];
-                    } else  {
-                        ans += dict2[word] * 13;
-                    }
-                } else {
-                    ans = 13 * (ans + dict2[word]);
-                }
-                pn++;
-                if (!isalpha(str[i])) {
-                    i++;
-                }
-            }
-            cout << ans << endl;
+            cout << strToNum[str] << endl;
         }
     }
     return 0;

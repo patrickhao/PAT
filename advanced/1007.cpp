@@ -1,28 +1,46 @@
 #include <cstdio>
-#include <cstdlib>
+#include <algorithm>
+
+using namespace std;
+struct elem {
+    int v, pre;
+};
+
+int arr[10010];
+elem dp[10010];
 
 int main() {
     freopen("./sample_in/1007.txt", "r", stdin);
-    int k, a, b, sumNow, sumMax = 0, len = 0;
-    scanf("%d", &k);
-    int* arr = (int*)malloc(k * sizeof(int));
-    for(int i = 0; i < k; i++) {
+    int n;
+    bool tag = false;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
         scanf("%d", arr + i);
-    } 
-    a = arr[0];
-    b = arr[k - 1];
-    for(int i = 0; i < k; i++) {
-        sumNow += arr[i];
-        if(sumNow < 0) {
-            sumNow = 0;
-            len = 0;
+        if (arr[i] >= 0) {
+            tag = true;
         }
-        else {
-            len++;
-            if(sumNow > sumMax) {
-                b = arr[i];
-            }
+    }
+    dp[0].v = arr[0];
+    dp[0].pre = 0;
+    for (int i = 1; i < n; i++) {
+        if (dp[i - 1].v > 0) {
+            dp[i].v = arr[i] + dp[i - 1].v;
+            dp[i].pre = dp[i - 1].pre;
+        } else {
+            dp[i].v = arr[i];
+            dp[i].pre = i;
         }
+    }
+    int index = 0;
+    for (int i = 1; i < n; i++) {
+        if (dp[i].v > dp[index].v) {
+            index = i;
+        }
+    }
+    if (tag) {
+        printf("%d %d %d\n", dp[index].v, arr[dp[index].pre], arr[index]);
+    } else {
+        printf("0 %d %d\n", arr[0], arr[n - 1]);
     }
 
     return 0;
