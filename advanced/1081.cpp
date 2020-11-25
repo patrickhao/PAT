@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <cmath>
 
 using namespace std;
 const int maxn = 110;
@@ -9,7 +8,11 @@ struct fraction {
     LL up, down;
 } fra;
 
-LL gcd(int a, int b) {
+LL abs(LL n) {
+    return n < 0 ? -1 * n : n;
+}
+
+LL gcd(LL a, LL b) {
     return b ? gcd(b, a % b) : a;
 }
 
@@ -21,7 +24,7 @@ void reduction(fraction &f) {
     if (f.up == 0) {
         f.down = 1;
     }
-    int g = gcd(abs(f.up), abs(f.down));
+    LL g = gcd(abs(f.up), abs(f.down));
     f.up /= g;
     f.down /= g; 
 }
@@ -38,7 +41,7 @@ void show(fraction f) {
     if (f.down == 1) {
         printf("%lld", f.up);
     } else if (f.up >= f.down) {
-        int a = abs(f.up);
+        LL a = abs(f.up);
         printf("%lld %lld/%lld", f.up / f.down, a % f.down, f.down);
     } else {
         printf("%lld/%lld", f.up, f.down);
