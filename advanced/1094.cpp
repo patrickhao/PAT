@@ -33,7 +33,7 @@ void bfs(int root) {
 int main() {
     freopen("./sample_in/1094.txt", "r", stdin);
     scanf("%d %d", &n, &m);
-    for (int i = 1; i <= n; i++) {
+    for (int i = 1; i <= m; i++) {
         int id, num;
         scanf("%d %d", &id, &num);
         for (int j = 0; j < num; j++) {
