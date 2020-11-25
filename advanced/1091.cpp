@@ -6,25 +6,24 @@ using namespace std;
 int m, n, l, t;
 int D[1290][130][61];
 bool inq[1290][130][61] = {false};
-int X[6] = {1, -1, 0, 0, 0, 0};
+int X[6] = {0, 0, 0, 0, 1, -1};
 int Y[6] = {0, 0, 1, -1, 0, 0};
-int Z[6] = {0, 0, 0, 0, 1, -1};
+int Z[6] = {1, -1, 0, 0, 0, 0};
 
 struct elem {
     int x, y, z;
-};
+} e;
 
 bool judge(int x, int y, int z) {
-    if (inq[x][y][z] || D[x][y][z] == 0) {
+    if (x < 0 || y < 0 || z < 0 || x >= m || y >= n || z >= l) {
         return false;
     }
-    if (x < 0 || y < 0 || z < 0 || x >= m || y >= n || z >= l) {
+    if (inq[x][y][z] == true || D[x][y][z] == 0) {
         return false;
     }
     return true;
 }
 
-elem e;
 int bfs(int x, int y, int z) {
     int a = 0;
     queue<elem> q;
@@ -43,7 +42,7 @@ int bfs(int x, int y, int z) {
             int nz = top.z + Z[i];
             if (judge(nx, ny, nz)) {
                 e.x = nx;
-                e.z = ny;
+                e.y = ny;
                 e.z = nz;
                 q.push(e);
                 inq[nx][ny][nz] = true;
