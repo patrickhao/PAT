@@ -1,58 +1,64 @@
 #include <cstdio>
 #include <vector>
-#include <queue>
+#include <algorithm>
+#include <set>
 #include <map>
 
 using namespace std;
-const int maxn = 1010;
+const int maxn = 100010;
 struct node {
-    vector<int> v;
-    vector<int> a;
-    int id, s;
+    int s, a;
 } D[maxn];
-int n;
-bool vis[maxn] = {false};
-map<int, int> idToIndex;
+int father[maxn];
 
-void dfs(int s) {
-    vis[s] = true;
-    for (int i = 0; i < D[s].v.size(); i++) {
-        if (!vis[i]) {
-            dfs(idToIndex[D[s].v[i]]);
-        }
+int findFather(int x) {
+    int a = x;
+    while (x != father[x]) {
+        x = father[x];
+    }
+
+    while (a != father[a]) {
+        int z = a;
+        a = father[a];
+        father[z] = x;
+    } 
+    return x;
+}
+
+void Union(int a, int b) {
+    int fa = findFather(a);
+    int fb = findFather(b);
+    if (fa != fb) {
+        father[fa] = fb;
     }
 }
 
+
 int main() {
     freopen("./sample_in/1114.txt", "r", stdin);
+    int n;
     scanf("%d", &n);
     for (int i = 0; i < n; i++) {
-        scanf("%d", &D[i].id);
-        idToIndex[D[i].id] = i;
-        int p, m;
-        scanf("%d %d", &p, &m);
-        if (p != -1) {
-            D[i].v.push_back(p);
-        }
-        if (m != -1) {
-            D[i].v.push_back(m);
-        }
+        int n1, n2, n3;
+        scanf("%d %d %d", &n1, &n2, &n3);
+        Union(n1, n2);
+        Union(n1, n3);
         int num;
         scanf("%d", &num);
         while (num--) {
-            int cid;
-            scanf("%d", &cid);
-            D[i].v.push_back(cid);
+            int c;
+            scanf("%d", &c);
+            Union(n1, c);
         }
-        scanf("%d", &D[i].s);
-        for (int i = 0; i < D[i].s; i++) {
-            int are;
-            scanf("%d", &are);
-            D[i].a.push_back(are);
+        scanf("%d %d", &D[n1].s, &D[n1].a);
+    }
+    int count = 0;
+    for (int i = 0; i < maxn; i++) {
+        if (father[i] = i) {
+            count++;
         }
     }
-
-    dfs(0);
+    printf("%d", count);
 
     return 0;
 }
