@@ -1,9 +1,15 @@
-#include <cstdio>
+#include <iostream>
 
 using namespace std;
 const int maxn = 100010;
 int father[maxn];
 bool vis[maxn] = {false};
+
+void init() {
+    for (int i = 0; i < maxn; i++) {
+        father[i] = i;
+    }
+}
 
 int findFather(int x) {
     int a = x;
@@ -14,7 +20,7 @@ int findFather(int x) {
     while (a != father[a]) {
         int z = a;
         a = father[a];
-        father[z] = x;
+        father[a] = x;
     }
     return x;
 }
@@ -28,56 +34,41 @@ void Union(int a, int b) {
     }
 }
 
-void init() {
-    for (int i = 0; i < maxn; i++) {
-        father[i] = i;
-    } 
-}
-
 int main() {
     freopen("./sample_in/1118.txt", "r", stdin);
     init();
-    int n, maxBid = 0;
-    scanf("%d", &n);
+    int n;
+    cin >> n;
     while (n--) {
-        int num, f;
-        scanf("%d", &num);
-        scanf("%d", &f); 
-        if (f > maxBid) {
-            maxBid = f;
-        }
-        vis[f] = true;
-        num--;
-        while (num--) {
-            int temp;
-            if (temp > maxBid) {
-                maxBid = temp;
-            }
-            scanf("%d", &temp);
-            if (vis[temp]) {
-                int tempF = findFather(temp);
-                Union(tempF, f);
-            } else {
-                vis[temp] = true;
-                Union(f, temp);
-            }
+        int k, fid, temp;
+        cin >> k >> fid;
+        vis[fid] = true;
+        for (int i = 1; i < k; i++) {
+            cin >> temp;
+            Union(fid, temp);
+            vis[temp] = true;
         }
     }
-    int unum = 0;
-    for (int i = 1; i <= maxBid; i++) {
-        if (findFather(i) == i) {
-            unum++;
+
+    int treeNum = 0, birdNum = 0;
+    for (int i = 1; i < maxn; i++) {
+        if (vis[i] && i == findFather(i)) {
+            treeNum++;
+        }
+        if (vis[i]) {
+            birdNum++;
         }
     }
-    printf("%d %d\n", unum, maxBid);
-    scanf("%d", &n);
+    cout << treeNum << " " << birdNum << endl;
+
+    cin >> n;
     while (n--) {
         int b1, b2;
-        scanf("%d %d", &b1, &b2);
+        cin >> b1 >> b2;
         if (findFather(b1) == findFather(b2)) {
-            printf("Yes\n");
+            cout << "Yes" << endl;
         } else {
-            printf("No\n");
+            cout << "No" << endl;
         }
     }
 

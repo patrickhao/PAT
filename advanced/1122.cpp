@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <algorithm>
 #include <vector>
+#include <set>
 
 using namespace std;
 const int MAXV = 300;
@@ -20,12 +21,21 @@ int main() {
     scanf("%d", &k);
     while (k--) {
         int num;
+        bool sta = true;
         scanf("%d", &num);
         vector<int> arr(num);
+        set<int> se;
         for (int i = 0; i < num; i++) {
             scanf("%d", &arr[i]);
+            se.insert(arr[i]);
         }
-        if (num == n + 1 && arr[0] == arr[num - 1]) {
+        for (int i = 0; i < num - 1; i++) {
+            if (G[arr[i]][arr[i + 1]] != 1) {
+                sta = false;
+                break;
+            }
+        }
+        if (se.size() == n && sta && num == n + 1 && arr[0] == arr[num - 1]) {
             printf("YES\n");
         } else {
             printf("NO\n");
