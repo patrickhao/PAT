@@ -1,39 +1,31 @@
 #include <iostream>
-#include <algorithm>
-#include <map>
 #include <string>
+#include <algorithm>
+#include <vector>
+#include <map>
 
-using namespace std;
-
-struct ts {
+using namespace std; 
+const int maxn = 100010;
+   
+struct ti {
     int h, m, s;
 };
-struct elem {
-    ts it, st;
-    int sta, delTag;
 
-    elem() {
-        delTag = 0;
-    }
-} d[10010];
+struct node {
+    ti t;
+    string cid;
+    bool flag;
+} rec[maxn];
 
-int cIndex = 0;
-map<string, int> cid;
-map<int, string> cname;
-
-bool cmp1(elem e1, elem e2) {
-    if(e1.delTag != e2.delTag) {
-        return e1.delTag < e2.delTag;
-    }
-}
-
-int stringToInt(string str) {
-    if(cid.find(str) != cid.end()) {
-        return cid[str];
+bool cmp(node n1, node n2) {
+    if (n1.t.h != n2.t.h) {
+        return n1.t.h < n2.t.h;
+    } else if (n1.t.m != n2.t.m) {
+        return n1.t.m < n2.t.m;
+    } else if (n1.t.s < n2.t.s) {
+        return n1.t.s < n2.t.s;
     } else {
-        cid[str] = cIndex;
-        cname[cIndex++] = str;
-        return cid[str];
+        return n1.cid < n2.cid;
     }
 }
 
@@ -41,47 +33,22 @@ int main() {
     freopen("./sample_in/1095.txt", "r", stdin);
     int n, k;
     cin >> n >> k;
-    int carNum = 0;
-    for(int i = 0; i < n; i++) {
-        string str, sta;
-        int h, m, s;
-        ts ttemp;
-        cin >> str;
-        scanf("%d:%d:%d", &ttemp.h, &ttemp.m, &ttemp.s);
-        cin >> sta;
-        int ind = stringToInt(str);
-        if(sta[0] == 'i') {
-            if(d[ind].sta != 0) {
-                d[ind].delTag = 1;
-            } else {
-                d[ind].sta = 1;
-                d[ind].it = ttemp;
-            }
+    for (int i = 0; i < n; i++) {
+        cin >> rec[i].cid;
+        scanf("%d:%d:%d", &rec[i].t.h, &rec[i].t.m, &rec[i].t.s);
+        string temp;
+        cin >> temp;
+        if (temp == "in") {
+            rec[i].flag = true;
         } else {
-            if(d[ind].sta == 1 && d[ind].delTag == 0) {
-                d[ind].sta = 2;
-                ts st;
-                if(d[ind].it.s <= ttemp.s) {
-                    st.s = ttemp.s - d[ind].it.s;
-                } else {
-                    st.s = ttemp.s + 60 - d[ind].it.s;
-                    ttemp.m--;
-                }
-                if(d[ind].it.m <= ttemp.m) {
-                    st.m = ttemp.m - d[ind].it.m;
-                } else {
-                    st.m = ttemp.m + 60 - d[ind].it.m;
-                    ttemp.h--;
-                }
-                st.h = ttemp.h - d[ind].it.h;
-                d[ind].st = st;
-                carNum++;
-            } else {
-                d[ind].delTag = 1;
-            }
+            rec[i].flag = false;
         }
     }
-    cout << carNum << endl;
-    cout << cid.size() << endl;
+    sort(rec, rec + n, cmp);
+    for (int i = 0; i < n; i++) {
+        cout << rec[i].cid;
+        printf(" %02d:%02d:%02d\n", rec[i].t.h, rec[i].t.m, rec[i].t.s);
+    }
+
     return 0;
 }
