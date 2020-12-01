@@ -49,6 +49,11 @@ int main() {
         cout << rec[i].cid;
         printf(" %02d:%02d:%02d\n", rec[i].t.h, rec[i].t.m, rec[i].t.s);
     }
+    int rn = 0;
+    map<string, int> mmap;
+    for (int i = 0; i < n; i++) {
+        if ()
+    }
 
     return 0;
 }
