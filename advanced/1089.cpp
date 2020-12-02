@@ -18,6 +18,9 @@ bool judge(int a[], int b[]) {
 bool insertSort() {
 	bool tag = false;
 	for (int i = 1; i < n; i++) {
+		if (i != 1 && judge(arr, brr)) {
+			tag = true;
+		}
 		int j = i, temp = arr[i];
 		while (j > 0 && arr[j - 1] > temp) {
 			arr[j] = arr[j - 1];
@@ -27,9 +30,6 @@ bool insertSort() {
 		if (tag){
 			break;
 		}
-		if (judge(arr, brr)) {
-			tag = true;
-		}
 	}
 	return tag ? true : false;
 }
@@ -37,14 +37,14 @@ bool insertSort() {
 void mergeSort() {
 	bool tag = false;
 	for (int step = 2; step / 2 < n; step += 2) {
+		if (step != 2 && judge(crr, brr)) {
+			tag = true;
+		}
 		for (int i = 0; i < n; i += step) {
 			sort(crr + i, crr + min(step + i, n));
 		}
 		if (tag) {
 			break;
-		}
-		if (judge(crr, brr)) {
-			tag = true;
 		}
 	}
 }
