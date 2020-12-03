@@ -1,68 +1,88 @@
-#include <cmath>
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <map>
 
 using namespace std;
-const int maxn = 10010;
-vector<int> Adj[maxn];
-bool gender[maxn] = {false};
-int n, m;
+struct node {
+    int data;
+    node *lchild, *rchild, *father;
+};
+int m, n;
 
-bool cmp(vector<int> v1, vector<int> v2) {
-    if (v1[0] != v2[0]) {
-        return v1[0] < v2[0];
+node* newNode(int data, node* father) {
+    node* Node = new node;
+    Node->data = data;
+    Node->father = father;
+    Node->lchild = Node->rchild = NULL;
+    return Node;
+}
+
+void create(node* &root, int data, node* father) {
+    if (root == NULL) {
+        root = newNode(data, father);
+        return;
+    }
+    if (data < root->data) {
+        create(root->lchild, data, root);
     } else {
-        return v1[1] < v2[1];
+        create(root->rchild, data, root);
     }
 }
 
-vector<int> path;
-vector<vector<int>> ans;
-int n1, n2;
-void dfs(int depth, int cur) {
-    if (depth == 3) {
-        if (cur == n2 && gender[path[0]] == gender[n1] && gender[path[1]] == gender[n2]) {
-            ans.push_back(path);
-        }
-        return;
+node* search(node* root, int target) {
+    if (root == NULL) {
+        return NULL;
     }
-    for (int i = 0; i < Adj[cur].size(); i++) {
-        path.push_back(Adj[cur][i]);
-        dfs(depth + 1, Adj[cur][i]);
-        path.pop_back();
+    if (target == root->data) {
+        return root;
+    } else if (target < root->data) {
+        return search(root->lchild, target);
+    } else {
+        return search(root->rchild, target);
     }
 }
 
 int main() {
-    freopen("./sample_in/1139.txt", "r", stdin);
-    scanf("%d %d", &n, &m);
-    for (int i = 0; i < m; i++) {
-        int u, v;
-        char s1[6], s2[6];
-        scanf("%s %s", s1, s2);
-        sscanf(s1, "%d", &u);
-        sscanf(s2, "%d", &v);
-        gender[abs(u)] = s1[0] == '-' ? true : false;
-        gender[abs(v)] = s2[0] == '-' ? true : false;
-        Adj[abs(u)].push_back(abs(v));
-        Adj[abs(v)].push_back(abs(u));
+    freopen("./sample_in/1143.txt", "r", stdin);
+    scanf("%d %d", &m, &n);
+    node* root = NULL;
+    while (n--) {
+        int temp;
+        scanf("%d", &temp);
+        create(root, temp, NULL);
     }
-    int k;
-    scanf("%d", &k);
-    while (k--) {
-        ans.clear();
-        scanf("%d %d", &n1, &n2);
-        n1 = abs(n1);
-        n2 = abs(n2);
-        dfs(0, n1);
-        sort(ans.begin(), ans.end(), cmp);
-        printf("%d\n", ans.size());
-        for (int i = 0; i < ans.size(); i++) {
-            printf("%04d %04d\n", ans[i][0], ans[i][1]);
+    while (m--) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        node *r1 = search(root, u), *r2 = search(root, v);
+        if (r1 != NULL && r2 != NULL) {
+            int ans = -1;
+            bool hashTable[100010] = {false};
+            while (r1->father != NULL) {
+                hashTable[r1->data] = true;
+                r1 = r1->father;
+            }
+            while (r2->father != NULL) {
+                if (hashTable[r2->data]) {
+                    ans = r2->data;
+                    break;
+                }
+                r2 = r2->father;
+            }
+            if (ans == u) {
+                printf("%d is an ancestor of %d.\n", u, v);
+            } else if (ans == v) {
+                printf("%d is an ancestor of %d.\n", v, u);
+            } else {
+                printf("LCA of %d and %d is %d.\n", u, v, ans);
+            }
+        } else if (r1 == NULL && r2 != NULL) {
+            printf("ERROR: %d is not found.\n", u);
+        } else if (r1 != NULL && r2 == NULL) {
+            printf("ERROR: %d is not found.\n", v);
+        } else if (r1 == NULL && r2 == NULL) {
+            printf("ERROR: %d and %d are not found.\n", u, v);
         }
     }
-
     return 0;
 }
