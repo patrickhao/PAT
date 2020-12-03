@@ -56,7 +56,7 @@ int main() {
         scanf("%d %d", &u, &v);
         node *r1 = search(root, u), *r2 = search(root, v);
         if (r1 != NULL && r2 != NULL) {
-            int ans = -1;
+            int ans = root->data;
             bool hashTable[100010] = {false};
             while (r1->father != NULL) {
                 hashTable[r1->data] = true;
