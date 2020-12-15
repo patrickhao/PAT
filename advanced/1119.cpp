@@ -2,7 +2,7 @@
 using namespace std;
 vector<int> pre, in, post;
 int n;
-bool u = true;
+bool flag = true;
 
 void getIn(int preL, int preR, int postL, int postR) {
 	if (preL == preR) {
@@ -17,19 +17,17 @@ void getIn(int preL, int preR, int postL, int postR) {
 		if (i - preL > 1) {
 			getIn(preL + 1, i - 1, postL, postL + (i - preL - 1) - 1);
 		} else {
-			u = false;
+			flag = false;
 		}
 		in.push_back(pre[preL]);
 		getIn(i, preR, postL + (i - preL - 1), postR - 1);
 	}
-	
 }
 
 int main() {
 	freopen("./sample_in/1119.txt", "r", stdin);
 	cin >> n;
-	pre.resize(n);
-	post.resize(n);
+	pre.resize(n), post.resize(n);
 	for (int i = 0; i < n; i++) {
 		cin >> pre[i];
 	}
@@ -37,7 +35,7 @@ int main() {
 		cin >> post[i];
 	}
 	getIn(0, n - 1, 0, n - 1);
-	if (u) {
+	if (flag) {
 		cout << "Yes" << endl;
 	} else {
 		cout << "No" << endl;
