@@ -1,97 +1,66 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int maxn = 33;
-int n, k;
+
 struct node {
-	int data;
-	node *lchild, *rchild;
+	int val;
+	node *left, *right;
 };
 
-node* newNode(int data) {
-	node* Node = new node;
-	Node->data = data;
-	Node->lchild = Node->rchild = NULL;
-	return Node;
+node* newNode(int v) {
+	node* root = new node;
+	root->val = v;
+	root->left = root->right = NULL;
+	return root;
 }
 
-void create(node* &root, int data) {
+void insert(node* &root, int v) {
 	if (root == NULL) {
-		root = newNode(data);
-		return;
-	}	
-	if (abs(data) < abs(root->data)) {
-		create(root->lchild, data);
-	} else {
-		create(root->rchild, data);
-	}
-}
-
-bool judge1(node* root) {
-	if (root->data < 0) {
-		if ((root->lchild != NULL && root->lchild->data < 0) || (root->rchild != NULL && root->rchild->data < 0)) {
-			return false;
-		} else {
-			return true;
-		}
-	} else {
-		if (root->lchild != NULL) {
-			return judge1(root->lchild);
-		}
-		if (root->rchild != NULL) {
-			return judge1(root->rchild);
-		}
-	}
-	return true;
-}
-
-int bn = -1;
-bool flag = true;
-void judge2(node* root, int n) {
-	if (root == NULL) {
-		if (n != bn) {
-			if (bn == -1) {
-				bn = n;
-			} else {
-				flag = false;
-			}
-		}
+		root = newNode(v);
 		return;
 	}
-	if (root->data > 0) {
-		judge2(root->lchild, n + 1);
-		judge2(root->rchild, n + 1);
+	if (abs(v) < abs(root->val)) insert(root->left, v);
+	else insert(root->right, v);
+}
+
+bool tag = true;
+vector<int> temp;
+void dfs(node* root, int cnt) {
+	if (root == NULL) {
+		temp.push_back(cnt);
+		return;
+	}
+	if (root->val > 0) {
+		dfs(root->left, cnt + 1);
+		dfs(root->right, cnt + 1);
 	} else {
-		judge2(root->lchild, n);
-		judge2(root->rchild, n);
+		if (root->left != NULL && root->left->val < 0) tag = false;
+		if (root->right != NULL && root->right->val < 0) tag = false;
+		dfs(root->left, cnt);
+		dfs(root->right, cnt);
 	}
 }
+
+void solve() {
+	int n; cin >> n;
+	node* root = NULL;
+	while (n--) {
+		int temp; cin >> temp;
+		insert(root, temp);
+	}
+	if (root->val > 0) {
+		tag = true; temp.clear();
+		dfs(root, 0);
+		for (int i = 0; i < temp.size() - 1; i++) if (temp[i] != temp[i + 1]) tag = false;
+		cout << (tag ? "YES" : "NO") << endl;
+	} else cout << "NO" << endl;
+
+}
+
 
 int main() {
-	freopen("./sample_in/1135.txt", "r", stdin);
-	scanf("%d", &k);
-	while (k--) {
-		scanf("%d", &n);
-		node* root = NULL;
-		for (int i = 0; i < n; i++) {
-			int temp;
-			scanf("%d", &temp);
-			create(root, temp);
-		}
-		if (root->data > 0) {
-			if (judge1(root)) {
-				flag = true;
-				judge2(root, 0);
-				if (flag) {
-					printf("Yes\n");
-				} else {
-					printf("No\n");
-				}
-			} else {
-				printf("No\n");
-			}
-		} else {
-			printf("No\n");
-		}
-	}
+	ios::sync_with_stdio(false);
+	cin.tie(0); cout.tie(0);
+	int t; cin >> t;
+	while (t--) solve();
 	return 0;
 }

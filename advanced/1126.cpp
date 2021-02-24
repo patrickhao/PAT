@@ -1,49 +1,60 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int maxn = 512;
-vector<int> Adj[maxn];
+const int MAXN = 550;
 int n, m;
+bool G[MAXN][MAXN] = {false};
+bool vis[MAXN] = {false};
+int degree[MAXN] = {0};
 
-int st, ed;
-void dfs(int cur) {
+
+void bfs(int i) {
+	queue<int> q;
+	vis[i] = true;
+	q.push(i);
+	while (!q.empty()) {
+		int u = q.front();
+		q.pop();
+		for (int v = 1; v <= n; v++) {
+			if (vis[v] == false && G[u][v]) {
+				q.push(v);
+				vis[v] = true;
+			}
+		}
+	}
+}
+
+int bfsTrave() {
+	int ret = 0;
+	for (int i = 1; i <= n; i++) {
+		if (vis[i] == false) {
+			bfs(i);
+			ret++;
+		}
+	}
+	return ret;
 }
 
 int main() {
-	freopen("./sample_in/1126.txt", "r", stdin);
+	ios::sync_with_stdio(false);
+	cin.tie(0); cout.tie(0);
 	cin >> n >> m;
 	while (m--) {
-		int u, v;
-		cin >> u >> v;
-		Adj[u].push_back(v);
-		Adj[v].push_back(u);
+		int u, v; cin >> u >> v;
+		degree[u]++; degree[v]++;
+		G[u][v] = true; G[v][u] = true;
 	}
-	bool flag = true;
-	vector<int> odd;
+
+	int a = 0, b = 0;
 	for (int i = 1; i <= n; i++) {
-		cout << Adj[i].size();
-		if (Adj[i].size() % 2 == 1) {
-			flag = false;
-			odd.push_back(i);
-		}
-		if (i < n) {
-			cout << " ";
-		} else {
-			cout << endl;
-		}
-	}
-	if (flag) {
-		cout << "Eulerian" << endl;
-	} else {
-		if (odd.size() == 2) {
-			st = odd[0];
-			ed = odd[1];
-			cout << "Semi-Eulerian" << endl;
-		} else {
-			cout << "Non-Eulerian" << endl;
-		}
+		if (degree[i] & 1) a++;
+		else b++;
+		cout << degree[i];
+		cout << (i < n ? " " : "\n");
 	}
 
-
-
+	int cnt = bfsTrave();
+	if (a == 0 && cnt == 1) cout << "Eulerian" << endl;
+	else if (a == 2 && cnt == 1) cout << "Semi-Eulerian" << endl;
+	else cout << "Non-Eulerian" << endl;
 	return 0;
 }

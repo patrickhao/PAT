@@ -1,90 +1,89 @@
-#include <cstdio>
-#include <queue>
-#include <algorithm>
-
+#include <bits/stdc++.h>
 using namespace std;
-const int maxn = 10010;
+const int MAXN = 1e4 + 50;
 int n;
-int G[maxn][maxn];
-int D[maxn] = {0}, ans[maxn] = {0};
-bool vis[maxn] = {false};
+bool G[MAXN][MAXN] = {false};
+bool hashTable[MAXN] = {false};
+bool vis[MAXN] = {false};
+int father[MAXN];
 
-void dfs(int u) {
-    vis[u] = true;
-    for (int v = 1; v <= n; v++) {
-        if (!vis[v] && G[u][v] == 1) {
-            dfs(v);
-        }
+int findFather(int a) {
+    int x = a;
+    while (x != father[x]) x = father[x];
+
+    while (a != x) {
+        int z = a;
+        a = father[a];
+        father[z] = x;
     }
+    return x;
 }
 
-int dfsTrave() {
-    int ans = 0;
-    for (int u = 1; u <= n; u++) {
-        if (!vis[u]) {
-            ans++;
-            dfs(u);
-        }
-    }
-    return ans;
+void Union(int a, int b) {
+    int fa = findFather(a);
+    int fb = findFather(b);
+    if (fa != fb) father[fa] = fb;
 }
 
-int bfs(int s) {
-    int d = 0;
-    fill(vis, vis + maxn, false);
+int bfs(int i) {
     queue<int> q;
-    q.push(s);
-    D[s] = 0;
-    vis[s] = true;
+    q.push(i);
+    vis[i] = true;
+    int ret = 0;
     while (!q.empty()) {
-        int u = q.front();
-        q.pop();
-        for (int v = 1; v <= n; v++) {
-            if (!vis[v] && G[u][v] == 1) {
-                vis[v] = true;
-                q.push(v);
-                D[v] = D[u] + 1;
-                if (D[v] > d) {
-                    d = D[v];
+        int cnt = q.size();
+        ret++;
+        while (cnt--) {
+            int u = q.front();
+            q.pop();
+            for (int v = 1; v <= n; v++) {
+                if (G[u][v] && vis[v] == false) {
+                    vis[v] = true;
+                    q.push(v);
+                    Union(i, v);
                 }
             }
         }
     }
-    return d;
+    return ret;
 }
 
-int depth = 0;
+vector<int> ans;
+int maxDepth = 0;
 void bfsTrave() {
     for (int i = 1; i <= n; i++) {
-        ans[i] = bfs(i);
-        if (ans[i] > depth) {
-            depth = ans[i];
+        fill(vis, vis + MAXN, false);
+        int depth = bfs(i);
+        if (depth > maxDepth) {
+            maxDepth = depth;
+            ans.clear();
+            ans.push_back(i);
+        } else if (depth == maxDepth) {
+            ans.push_back(i);
         }
     }
 }
 
 int main() {
-    freopen("./sample_in/1021.txt", "r", stdin);
-    scanf("%d", &n);
-    int table[maxn] = {0};
+    ios::sync_with_stdio(false);
+    cin.tie(0); cout.tie(0);
+    for (int i = 0; i < MAXN; i++) father[i] = i;
+    cin >> n;
     for (int i = 0; i < n - 1; i++) {
-        int u, v;
-        scanf("%d %d", &u, &v);
-        G[u][v] = 1;
-        G[v][u] = 1;
-        table[u]++;
-        table[v]++;
+        int u, v; cin >> u >> v;
+        G[u][v] = true; G[v][u] = true;
     }
-    int tag = dfsTrave();
-    if (tag == 1) {
-        bfsTrave();
-        for (int i = 1; i <= n; i++) {
-            if (ans[i] == depth) {
-                printf("%d\n", i);
-            }
-        }
+    bfsTrave();
+    
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) {
+        if (father[i] == i) cnt++;
+    }
+    if (cnt > 1) {
+        cout << "Error: " << cnt << " components" << endl;
     } else {
-        printf("Error: %d components", tag);
+        for (auto v : ans) cout << v << endl;
     }
+    
     return 0;
 }
