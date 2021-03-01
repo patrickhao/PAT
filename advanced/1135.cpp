@@ -51,8 +51,8 @@ void solve() {
 		tag = true; temp.clear();
 		dfs(root, 0);
 		for (int i = 0; i < temp.size() - 1; i++) if (temp[i] != temp[i + 1]) tag = false;
-		cout << (tag ? "YES" : "NO") << endl;
-	} else cout << "NO" << endl;
+		cout << (tag ? "Yes" : "No") << endl;
+	} else cout << "No" << endl;
 
 }
 

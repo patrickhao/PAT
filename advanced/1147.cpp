@@ -1,84 +1,43 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int maxn = 1010;
-int heap[maxn];
-int m, n;
+int n;
 
-int on = 0;
-void postOrder(int cur) {
-	if (cur > n) {
-		return;
-	}
-	postOrder(cur * 2);
-	postOrder(cur * 2 + 1);
-	printf("%d", heap[cur]);
-	if (++on < n) {
-		printf(" ");
-	} else {
-		printf("\n");
-	}
+bool judgeMax(int root, const vector<int>& heap) {
+	if (root * 2 > n) return true;
+	if (heap[root] < heap[root * 2] || (root * 2 + 1 <= n && heap[root] < heap[root * 2 + 1])) return false;
+	return judgeMax(root * 2, heap) && judgeMax(root * 2 + 1, heap);
 }
 
-bool minJudge(int cur) {
-	int L = cur * 2, R = cur * 2 + 1;
-	if (L <= n) {
-		if (heap[L] < heap[cur]) {
-			return false;
-		} else {
-			return minJudge(L);
-		}
-	}
-	if (R <= n) {
-		if (heap[R] < heap[cur]) {
-			return false;
-		} else {
-			return minJudge(R);
-		}
-	}
-	return true;
+bool judgeMin(int root, const vector<int>& heap) {
+	if (root * 2 > n) return true;
+	if (heap[root] > heap[root * 2] || (root * 2 + 1 <= n && heap[root] > heap[root * 2 + 1])) return false;
+	return judgeMin(root * 2, heap) && judgeMin(root * 2 + 1, heap);
 }
 
-bool maxJudge(int cur) {
-	int L = cur * 2, R = cur * 2 + 1;
-	if (L <= n) {
-		if (heap[L] > heap[cur]) {
-			return false;
-		} else {
-			return maxJudge(L);
-		}
-	}
-	if (R <= n) {
-		if (heap[R] > heap[cur]) {
-			return false;
-		} else {
-			return maxJudge(R);
-		}
-	}
-	return true;
+int cnt = 0;
+void postOrder(int root, const vector<int>& heap) {
+	if (root > n) return;
+	postOrder(root * 2, heap);
+	postOrder(root * 2 + 1, heap);
+	cout << heap[root];
+	cout << (++cnt < n ? " " : "\n");
+}
+
+void solve() {
+	vector<int> heap(n + 1, -1);
+	for (int i = 1; i <= n; i++) cin >> heap[i];
+	cnt = 0;
+	if (judgeMax(1, heap)) cout << "Max Heap" << endl;
+	else if (judgeMin(1, heap)) cout << "Min Heap" << endl;
+	else cout << "Not Heap" << endl;
+	postOrder(1, heap);
 }
 
 int main() {
-	freopen("./sample_in/1147.txt", "r", stdin);
-	scanf("%d %d", &m, &n);
-	while (m--) {
-		for (int i = 1; i <= n; i++) {
-			scanf("%d", heap + i);
-		}
-		bool tag = true;
-		if (minJudge(1)) {
-			printf("Min Heap\n");
-			tag = false;
-		}
-		if (maxJudge(1)) {
-			printf("Max Heap\n");
-			tag = false;
-		}
-		if (tag) {
-			printf("Not Heap\n");
-		}
-		on = 0;
-		postOrder(1);
-	}
+	ios::sync_with_stdio(false);
+	cin.tie(0); cout.tie(0);
+	int t; cin >> t; cin >> n;
+	while (t--) solve();
 
 	return 0;
 }
