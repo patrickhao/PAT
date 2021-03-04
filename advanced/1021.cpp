@@ -1,89 +1,82 @@
 #include <bits/stdc++.h>
 using namespace std;
 const int MAXN = 1e4 + 50;
-int n;
 bool G[MAXN][MAXN] = {false};
-bool hashTable[MAXN] = {false};
+int n;
+
 bool vis[MAXN] = {false};
-int father[MAXN];
-
-int findFather(int a) {
-    int x = a;
-    while (x != father[x]) x = father[x];
-
-    while (a != x) {
-        int z = a;
-        a = father[a];
-        father[z] = x;
-    }
-    return x;
-}
-
-void Union(int a, int b) {
-    int fa = findFather(a);
-    int fb = findFather(b);
-    if (fa != fb) father[fa] = fb;
-}
-
-int bfs(int i) {
+void bfs(int s) {
     queue<int> q;
-    q.push(i);
-    vis[i] = true;
-    int ret = 0;
+    vis[s] = true;
+    q.push(s);
     while (!q.empty()) {
-        int cnt = q.size();
-        ret++;
-        while (cnt--) {
-            int u = q.front();
-            q.pop();
-            for (int v = 1; v <= n; v++) {
-                if (G[u][v] && vis[v] == false) {
-                    vis[v] = true;
-                    q.push(v);
-                    Union(i, v);
-                }
+        int u = q.front();
+        q.pop();
+        for (int v = 1; v <= n; v++) {
+            if (G[u][v] && vis[v] == false) {
+                q.push(v);
+                vis[v] = true;
             }
         }
     }
-    return ret;
 }
 
-vector<int> ans;
-int maxDepth = 0;
-void bfsTrave() {
+int bfsTrave() {
+    int cnt = 0;
     for (int i = 1; i <= n; i++) {
-        fill(vis, vis + MAXN, false);
-        int depth = bfs(i);
-        if (depth > maxDepth) {
-            maxDepth = depth;
-            ans.clear();
-            ans.push_back(i);
-        } else if (depth == maxDepth) {
-            ans.push_back(i);
+        if (vis[i] == false) {
+            bfs(i);
+            cnt++;
         }
     }
+    return cnt;
+}
+
+vector<int> arr;
+int maxDepth = 0;
+void dfs(int u, int depth) {
+    if (depth == maxDepth) {
+        arr.push_back(u);
+    } else if (depth > maxDepth) {
+        arr.clear();
+        arr.push_back(u);
+        maxDepth = depth;
+    }
+    for (int v = 1; v <= n; v++) {
+        if (G[u][v] && vis[v] == false) {
+            vis[v] = true;
+            dfs(v, depth + 1);
+        }
+    }
+}
+
+void dfsTrave(int s) {
+    fill(vis, vis + MAXN, false);
+    vis[s] = true;
+    arr.clear();
+    maxDepth = 0;
+    dfs(s, 0);
 }
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
-    for (int i = 0; i < MAXN; i++) father[i] = i;
     cin >> n;
     for (int i = 0; i < n - 1; i++) {
         int u, v; cin >> u >> v;
         G[u][v] = true; G[v][u] = true;
     }
-    bfsTrave();
-    
-    int cnt = 0;
-    for (int i = 1; i <= n; i++) {
-        if (father[i] == i) cnt++;
-    }
-    if (cnt > 1) {
-        cout << "Error: " << cnt << " components" << endl;
-    } else {
+    int cnt = bfsTrave();
+    if (cnt != 1) cout << "Error: " << cnt << " components" << endl;
+    else {
+        set<int> ans;
+        dfsTrave(1);
+        for (auto v : arr) ans.insert(v);
+        int temp = arr[0];
+        dfsTrave(temp);
+        for (auto v : arr) ans.insert(v);
         for (auto v : ans) cout << v << endl;
-    }
-    
+    }    
+
     return 0;
 }

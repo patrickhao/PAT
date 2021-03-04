@@ -1,160 +1,134 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
+#include <bits/stdc++.h>
 using namespace std;
+const int INF = 1e9;
+const int MAXN = 550;
 
-const int MAXV = 512;
-const int INF = 1000000000;
-int n, m, st, ed, G[MAXV][MAXV], T[MAXV][MAXV];
-int d[MAXV], t[MAXV];
-bool vis1[MAXV] = {false}, vis2[MAXV] = {false};
-vector<int> pre1[MAXV], pre2[MAXV];
-vector<int> path1, path2, pathTemp1, pathTemp2;
-int optValue1 = INF, optValue2 = INF;
+struct node {
+    int v, l, t;
+    
+    node() {}
+    node(int v, int l, int t) : v(v), l(l), t(t) {}
+};
+vector<node> Adj[MAXN];
+int n, m, st, ed;
 
-void dijkstra(int s) {
-    fill(d, d + MAXV, INF);
-    fill(t, t + MAXV, INF);
-    d[s] = 0;
-    t[s] = 0;
+int pre1[MAXN], pre2[MAXN], d1[MAXN], d2[MAXN];
+bool vis1[MAXN] = {false}, vis2[MAXN] = {false};
+int ans1, ans2;
+void dijkstra1(int st, int ed) {
+    for (int i = 0; i < n; i++) pre1[i] = i;
+    fill(d1, d1 + MAXN, INF);
+    fill(d2, d2 + MAXN, INF);
+    d1[st] = d2[st] = 0;
     for (int i = 0; i < n; i++) {
-        int u1 = -1, u2 = -1, MIN1 = INF, MIN2 = INF;
+        int u = -1, MIN = INF;
         for (int j = 0; j < n; j++) {
-            if (!vis1[j] && d[j] < MIN1) {
-                u1 = j;
-                MIN1 = d[j];
-            }
-            if (!vis2[j] && t[j] < MIN2) {
-                u2 = j;
-                MIN2 = t[j];
+            if (vis1[j] == false && d1[j] < MIN) {
+                u = j;
+                MIN = d1[j];
             }
         }
-        if (u1 == -1 || u2 == -1) {
-            return;
-        }
-        vis1[u1] = true;
-        vis2[u2] = true;
-        for (int v1 = 0; v1 < n; v1++) {
-            if (!vis1[v1] && G[u1][v1] != INF) {
-                if (d[u1] + G[u1][v1] < d[v1]) {
-                    d[v1] = d[u1] + G[u1][v1];
-                    pre1[v1].clear();
-                    pre1[v1].push_back(u1);
-                } else if (d[u1] + G[u1][v1] == d[v1]) {
-                    pre1[v1].push_back(u1);
-                }
-            }
-        }
-        for (int v2 = 0; v2 < n; v2++) {
-            if (!vis2[v2] && T[u2][v2] != INF) {
-                if (t[u2] + T[u2][v2] < t[v2]) {
-                    t[v2] = t[u2] + T[u2][v2];
-                    pre2[v2].clear();
-                    pre2[v2].push_back(u2);
-                } else if (t[u2] + T[u2][v2] == t[v2]) {
-                    pre2[v2].push_back(u2);
+        if (u == -1) return;
+        vis1[u] = true;
+        for (int j = 0; j < Adj[u].size(); j++) {
+            int v = Adj[u][j].v;
+            if (vis1[v] == false) {
+                if (d1[u] + Adj[u][j].l < d1[v]) {
+                    pre1[v] = u;
+                    d1[v] = d1[u] + Adj[u][j].l;
+                    d2[v] = d2[u] + Adj[u][j].t;
+                } else if (d1[u] + Adj[u][j].l == d1[v] && d2[u] + Adj[u][j].t < d2[v]) {
+                    pre1[v] = u;
+                    d2[v] = d2[u] + Adj[u][j].t;
                 }
             }
         }
     }
+    ans1 = d1[ed];
 }
 
-void dfs1(int u) {
+int nums[MAXN] = {0};
+void dijkstra2(int st, int ed) {
+    for (int i = 0; i < n; i++) pre2[i] = i;
+    fill(d1, d1 + MAXN, INF);
+    d1[st] = 0; nums[st] = 1;
+    for (int i = 0; i < n; i++) {
+        int u = -1, MIN = INF;
+        for (int j = 0; j < n; j++) {
+            if (vis2[j] == false && d1[j] < MIN) {
+                u = j;
+                MIN = d1[j];
+            }
+        }
+        if (u == -1) return;
+        vis2[u] = true;
+        for (int j = 0; j < Adj[u].size(); j++) {
+            int v = Adj[u][j].v;
+            if (vis2[v] == false) {
+                if (d1[u] + Adj[u][j].t < d1[v]) {
+                    pre2[v] = u;
+                    d1[v] = d1[u] + Adj[u][j].t;
+                    nums[v] = nums[u] + 1;
+                } else if (d1[u] + Adj[u][j].t == d1[v] && nums[u] + 1 < nums[v]) {
+                    pre2[v] = u;
+                    nums[v] = nums[u] + 1;
+                }
+            }
+        }
+    }
+    ans2 = d1[ed];
+}
+
+vector<int> path1, path2;
+void dfs1(int u, int st) {
     if (u == st) {
-        pathTemp1.push_back(u);
-        int value = 0;
-        for (int i = pathTemp1.size() - 1; i > 0; i--) {
-            int id = pathTemp1[i], idnext = pathTemp1[i - 1];
-            value += T[id][idnext];
-        }
-        if (value < optValue1) {
-            optValue1 = value;
-            path1 = pathTemp1;
-        }
-        pathTemp1.pop_back();
+        path1.push_back(u);
         return;
     }
-    pathTemp1.push_back(u);
-    for (int i = 0; i < pre1[u].size(); i++) {
-        dfs1(pre1[u][i]);
-    }
-    pathTemp1.pop_back();
+    path1.push_back(u);
+    dfs1(pre1[u], st);
 }
 
-void dfs2(int u) {
+void dfs2(int u, int st) {
     if (u == st) {
-        pathTemp2.push_back(u);
-        int value = 0;
-        for (int i = pathTemp2.size() - 1; i > 0; i--) {
-            int id = pathTemp2[i], idnext = pathTemp2[i - 1];
-            value += G[id][idnext];
-        }
-        if (value < optValue2) {
-            optValue2 = value;
-            path2 = pathTemp2;
-        }
-        pathTemp2.pop_back();
+        path2.push_back(u);
         return;
     }
-    pathTemp2.push_back(u);
-    for (int i = 0; i < pre2[u].size(); i++) {
-        dfs2(pre2[u][i]);
-    }
-    pathTemp2.pop_back();
+    path2.push_back(u);
+    dfs2(pre2[u], st);
 }
 
-void showPath(vector<int> path) {
+void putPath(vector<int> path) {
     for (int i = path.size() - 1; i >= 0; i--) {
         cout << path[i];
-        if (i != 0) {
-            cout << " -> ";
-        }
+        cout << (i > 0 ? " -> " : "\n");
     }
 }
 
 int main() {
-    freopen("./sample_in/1111.txt", "r", stdin);
-    int u, v, flag, l, ti;
-    fill(G[0], G[0] + MAXV * MAXV, INF);
-    fill(T[0], T[0] + MAXV * MAXV, INF);
+    ios::sync_with_stdio(false);
+    cin.tie(0); cout.tie(0);
     cin >> n >> m;
     while (m--) {
-       cin >> u >> v >> flag >> l >> ti;
-       G[u][v] = l;
-       T[u][v] = ti;
-       if (flag == 0) {
-           G[v][u] = l;
-           T[v][u] = ti;
-       } 
+        int u, v, tag, l, t; cin >> u >> v >> tag >> l >> t;
+        if (tag == 0) {
+            Adj[u].push_back(node(v, l, t));
+            Adj[v].push_back(node(u, l, t));
+        } else Adj[u].push_back(node(v, l, t));
     }
     cin >> st >> ed;
-    dijkstra(st);
-    dfs1(ed);
-    dfs2(ed);
-
-    bool same = true;
-    if (path1.size() == path2.size()) {
-        for (int i = 0; i < path1.size(); i++) {
-            if (path1[i] != path2[i]) {
-                same = false;
-                break;
-            }
-        }
+    dijkstra1(st, ed);
+    dijkstra2(st, ed);
+    dfs1(ed, st);
+    dfs2(ed, st);
+    if (path1 == path2) {
+        cout << "Distance = " << ans1 << "; Time = " << ans2 << ": ";
+        putPath(path1);
     } else {
-        same = false;
-    }
-    if (same) {
-        cout << "Distance = " << d[ed] << "; Time = " << t[ed] << ": ";
-        showPath(path1);
-        cout << endl;
-    } else {
-        cout << "Distance = " << d[ed] << ": ";
-        showPath(path1);
-        cout << endl;
-        cout << "Time = " << t[ed] << ": ";
-        showPath(path2);
-        cout << endl;
+        cout << "Distance = " << ans1 << ": ";
+        putPath(path1);
+        cout << "Time = " << ans2 << ": ";
+        putPath(path2);
     }
 
     return 0;
